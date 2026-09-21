@@ -1,19 +1,20 @@
+from toolkit.errors import calcError
+
 class Calc():
     def __init__(self):
         self.userinput = ""
         self.expression = []
         self.answer = 0
-    def getinput(self):
-        self.userinput = input()
-    def parser(self):
-        se = self.expression
-        simvoly = [x for x in list(self.userinput) if x != ' ']
 
+    def tokenization(self, inp):
+        se = self.expression
+        simvoly = [x for x in list(inp) if x != ' ']
+        if simvoly == []:
+            raise calcError('Empty sequence.')
         oper = '+-*/'
         if simvoly[0] in '0123456789' and any(x for x in oper if x in simvoly):
             if any(x for x in ['**', '//', '+++', '---'] if x in simvoly):
-                print('vi daun')
-                exit()
+                raise calcError('Unsupported operator sequence.')
             mode = -1
             # 0 - num, 1 - sym
             cifry = '0123456789'
@@ -33,17 +34,15 @@ class Calc():
                         if not '.' in se[-1]:
                             se[-1] += sym
                         else:
-                            print('vi daun')
-                            exit()
+                            raise calcError('Invalid format of a float number')
                     else:
                         mode = 1
                         se.append(sym)
         else:
             self.expression = float(''.join(simvoly))
         if type(self.expression) == list and any(x for x in self.expression if x[-1] == '.'):
-            print('vi daun')
-            exit()
-    def counter(self):
+            raise calcError('Unsupported terminating symbol')
+    def calculation(self):
         se = self.expression
         def Z(se,n,el):
             a = float(se[n - 1])
@@ -86,6 +85,4 @@ class Calc():
                 self.answer = int(c)
             else:
                 self.answer = c
-    def printer(self):
-        print(round(self.answer,4))
-
+        return self.answer

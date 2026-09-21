@@ -2,9 +2,9 @@ class toolkitError(Exception):
     """for all toolkit errors"""
 
 
-class calculatorError(toolkitError):
+class calcError(toolkitError):
     """expression cannot be tokenized or calculated"""
 
 
-class converterError(toolkitError):
+class convError(toolkitError):
     """unit conversion is invalid"""
