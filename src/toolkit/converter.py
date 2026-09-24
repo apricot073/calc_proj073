@@ -14,4 +14,5 @@ def abc(st):
 
 a = abc('asdfsdfasdf')
 
-a
+print(len(set('   ')))
+print('abc'[0:2])
