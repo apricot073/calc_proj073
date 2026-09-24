@@ -1,10 +1,5 @@
-class toolkitError(Exception):
-    """for all toolkit errors"""
+import sys
 
-
-class calcError(toolkitError):
-    """expression cannot be tokenized or calculated"""
-
-
-class convError(toolkitError):
-    """unit conversion is invalid"""
+def CalcError(cause):
+    print(f"Error: {cause}", file=sys.stderr)
+    sys.exit(2)

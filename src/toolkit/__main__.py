@@ -51,6 +51,7 @@ def main(argv: list[str]):
     if args.command == "calc":
         my_calc = Calc()
         my_calc.tokenization(args.expression)
+        my_calc.validation()
         print(my_calc.calculation())
     elif args.command == "convert":
         print(args.value)
