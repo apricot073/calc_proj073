@@ -1,8 +1,9 @@
-from errors import CalcError
-from itertools import product
+from itertools import pairwise, product
+
+from toolkit.errors import CalcError
 
 
-class Calc():
+class Calc:
     """This class contains all the functions required for the calculator."""
     def __init__(self):
         """
@@ -13,15 +14,15 @@ class Calc():
         self.orig_expression = []
         self.answer = 0
 
-    def tokenization(self, input1=None):
+    def tokenization(self, input1):
         """
         This function splits the expression into a list of tokens.
         :param input1: the expression passed through parser in __main__
         """
         if not input1 or set(input1) == {' '}:
-            CalcError('Empty sequence.')
+            raise CalcError('Empty sequence.')
         self.orig_expression = input1
-        symbols = [x for x in list(input1.replace('--', '+')) if x != ' ']
+        symbols = [x for x in input1 if x != ' ']
         digits = ['0123456789.', 'number']
         operators1 = ['+-', 'operator1']
         operators2 = ['*/', 'operator2']
@@ -44,7 +45,7 @@ class Calc():
                             tokens.append(sym)
                     break
             if not found:
-                CalcError('Unknown symbol.')
+                raise CalcError('Unknown symbol.')
         self.expression = tokens
 
     def validation(self):
@@ -59,9 +60,9 @@ class Calc():
         digits = '0123456789.'
         for n, t in enumerate(tokens0):
             if len(tokens0)-1 > n > 0 and t == ' ' and tokens0[n-1] in digits and tokens0[n+1] in digits:
-                CalcError('Invalid space.')
+                raise CalcError('Invalid space.')
         if any(x for x in '+-*/.' if x in tokens0) and not any(x for x in '0123456789' if x in tokens0):
-            CalcError('Invalid sequence.')
+            raise CalcError('Invalid sequence.')
 
         invalid_sequences = [''.join(x) for x in product('*/.', repeat=2)] + ['+*', '-*', '+/', '-/']
 
@@ -72,32 +73,35 @@ class Calc():
             :param nxt: the next token in the list.
             """
             if token.count('.') > 1:
-                CalcError('Invalid float number format.')
+                raise CalcError('Invalid float number format.')
             if token == '/' and nxt not in '+-*/.' and float(nxt) == 0:
-                CalcError('Division by zero.')
+                raise CalcError('Division by zero.')
             if nxt and any(x for x in invalid_sequences if x in token+nxt):
-                CalcError('Invalid sequence.')
+                raise CalcError('Invalid sequence.')
 
-        for token1, nxt1 in zip(tokens, tokens[1:]):
+        for token1, nxt1 in pairwise(tokens):
             token_validation(token1, nxt1)
 
         token_validation(tokens[-1])
         if tokens[-1] in '+-*/':
-            CalcError('Invalid terminating symbol.')
+            raise CalcError('Invalid terminating symbol.')
 
         if '+' in tokens[0] or '-' in tokens[0]:
-            tokens[0] += tokens[1]
-            tokens.pop(1)
-            if len(tokens[0]) > 2:
-                minuses_and_pluses = (tokens[0].count('-')+tokens[0].count('+'))
-                minuses = tokens[0].count('-')
-                tokens[0] = tokens[0][minuses_and_pluses:]
-                if minuses % 2 == 0:
-                    tokens[0] = '+' + tokens[0]
+            if '+' not in tokens[0]:
+                if len(tokens[0]) % 2 == 0:
+                    tokens.pop(0)
                 else:
-                    tokens[0] = '-' + tokens[0]
+                    tokens.pop(0)
+                    if int(tokens[0]) < 0:
+                        tokens[0] = tokens[0][1:]
+                    else:
+                        tokens[0] = '-' + tokens[0]
+
+            else:
+                tokens.pop(0)
+
         elif tokens[0] in '*/':
-            CalcError('Invalid starting symbol.')
+            raise CalcError('Invalid starting symbol.')
 
     def calculation(self):
         """
@@ -114,31 +118,34 @@ class Calc():
             :param operator: the operator token itself.
             :return: index at which is the obtained value and the modified expression.
             """
-            print(expr)
-            a = float(expr[n - 1])
-            b = float(expr[n + 1])
-            expr[n - 1] = expr[n + 1] = 'Z'
+            try:
+                a = float(expr[n - 1])
+                b = float(expr[n + 1])
+            except (ValueError, TypeError, IndexError):
+                raise CalcError('Invalid sequence.')
+            else:
+                expr[n - 1] = expr[n + 1] = 'Z'
 
-            if set(operator) == {'+'}:
-                operator = '+'
-            if set(operator) == {'-'} or len(set(operator)) > 1:
-                if operator.count('-') % 2 == 0:
+                if set(operator) == {'+'}:
                     operator = '+'
-                else:
-                    operator = '-'
+                if set(operator) == {'-'} or len(set(operator)) > 1:
+                    if operator.count('-') % 2 == 0:
+                        operator = '+'
+                    else:
+                        operator = '-'
 
-            if operator == '+':
-                expr[n] = a+b
-            if operator == '-':
-                expr[n] = a-b
-            if operator == '*':
-                expr[n] = a*b
-            if operator == '/':
-                expr[n] = a/b
-            expr[n] = round(expr[n], 4)
-            expr = [x for x in expr if x != 'Z']
-            n -= 2
-            return n, expr
+                if operator == '+':
+                    expr[n] = a + b
+                if operator == '-':
+                    expr[n] = a - b
+                if operator == '*':
+                    expr[n] = a * b
+                if operator == '/':
+                    expr[n] = a / b
+                expr[n] = round(expr[n], 4)
+                expr = [x for x in expr if x != 'Z']
+                n -= 2
+                return n, expr
 
         k = 0
         while k < len(exp) - 1:
@@ -155,16 +162,19 @@ class Calc():
                 k, exp = operation(exp, k, elem)
             k += 1
 
-        c = float(exp[0])
-        if int(c) == c:
-            self.answer = int(c)
+        try:
+            c = float(exp[0])
+        except (ValueError, IndexError):
+            raise CalcError('Invalid sequence.')
         else:
-            self.answer = c
-        print(self.answer)
-        return self.answer
+            if int(c) == c:
+                self.answer = int(c)
+            else:
+                self.answer = c
+            return self.answer
 
 
-# tests = ['2-+-3']
+# tests = ['--5']
 # test_calc = Calc()
 # for test in tests:
 #     test_calc.tokenization(test)

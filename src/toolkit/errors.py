@@ -1,5 +1,6 @@
-import sys
+class CalcError(Exception):
+    pass
 
-def CalcError(cause):
-    print(f"Error: {cause}", file=sys.stderr)
-    sys.exit(2)
+
+class ConvError(Exception):
+    pass
