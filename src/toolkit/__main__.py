@@ -4,7 +4,7 @@ import argparse
 import sys
 
 from toolkit.calculator import Calc
-from toolkit.converter import Convert
+from toolkit.converter import convert
 from toolkit.errors import CalcError, ConvError
 
 
@@ -57,13 +57,12 @@ def main(argv: list[str]):
             my_calc.validation()
             print(my_calc.calculation())
         elif args.command == "convert":
-            print(Convert(args.value,args.from_unit, args.to_unit))
+            print(convert(args.value,args.from_unit, args.to_unit))
     except (CalcError, ConvError) as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(2)
     else:
         return 0
-
 
 
 if __name__ == "__main__":

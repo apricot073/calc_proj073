@@ -172,11 +172,3 @@ class Calc:
             else:
                 self.answer = c
             return self.answer
-
-
-# tests = ['--5']
-# test_calc = Calc()
-# for test in tests:
-#     test_calc.tokenization(test)
-#     test_calc.validation()
-#     test_calc.calculation()

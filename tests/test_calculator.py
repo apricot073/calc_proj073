@@ -14,7 +14,7 @@ def calc(expression: str):
 
 # positive tests
 
-def test_addition():
+def test_add():
     assert calc("2+3") == 5
 
 
@@ -34,11 +34,11 @@ def test_float_numbers():
     assert calc("2.5+1.5") == 4.0
 
 
-def test_priority_multiplication_over_addition():
+def test_priority_1():
     assert calc("2+3*4") == 14
 
 
-def test_priority_division_over_subtraction():
+def test_priority_2():
     assert calc("10-6/2") == 7
 
 
@@ -93,7 +93,7 @@ def test_missing_operand_at_end():
         c.validation()
 
 
-def test_two_binary_operators_in_row():
+def test_two_binary_operators():
     c = Calc()
     c.tokenization("2+*3")
     with pytest.raises(CalcError):

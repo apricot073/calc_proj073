@@ -21,7 +21,14 @@ units = (
 )
 
 
-def Convert(value, from_unit, to_unit):
+def convert(value, from_unit, to_unit):
+    """
+    This function converts values from one unit to another.
+    :param value: the value to convert.
+    :param from_unit: the unit from which to convert.
+    :param to_unit: the unit to which to convert.
+    :return: converted value.
+    """
     group_from = None
     group_to = None
     found = False
