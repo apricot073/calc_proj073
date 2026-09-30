@@ -25,7 +25,7 @@ class Calc:
         symbols = [x for x in input1 if x != ' ']
         digits = ['0123456789.', 'number']
         operators1 = ['+-', 'operator1']
-        operators2 = ['*/', 'operator2']
+        operators2 = ['*/%', 'operator2']
         possible_symbols = [digits, operators1, operators2]
         tokens = []
         mode = ''
@@ -65,6 +65,7 @@ class Calc:
             raise CalcError('Invalid sequence.')
 
         invalid_sequences = [''.join(x) for x in product('*/.', repeat=2)] + ['+*', '-*', '+/', '-/']
+        invalid_sequences.remove('//')
 
         def token_validation(token, nxt=None):
             """
@@ -142,6 +143,10 @@ class Calc:
                     expr[n] = a * b
                 if operator == '/':
                     expr[n] = a / b
+                if operator == '//':
+                    expr[n] = a // b
+                if operator == '%':
+                    expr[n] = a % b
                 expr[n] = round(expr[n], 4)
                 expr = [x for x in expr if x != 'Z']
                 n -= 2
@@ -152,7 +157,7 @@ class Calc:
             if k >= len(exp) - 1:
                 break
             elem = exp[k]
-            if elem in ['*', '/']:
+            if elem in ['*', '/', '//', '%']:
                 k, exp = operation(exp, k, elem)
             k += 1
         k = 0

@@ -30,6 +30,22 @@ def test_division():
     assert calc("10/4") == 2.5
 
 
+def test_integer_division():
+    assert calc("10//6") == 1
+
+
+def test_negative_integer_division():
+    assert calc("-7//3") == -3
+
+
+def test_modulo():
+    assert calc("5%3") == 2
+
+
+def test_modulo_negative():
+    assert calc("-8%3") == 1
+
+
 def test_float_numbers():
     assert calc("2.5+1.5") == 4.0
 
