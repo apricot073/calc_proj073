@@ -4,7 +4,7 @@ This is a CLI toolkit that includes an expression calculator and a unit converte
 
 # installing
 
-To install toolkit module into your environment, type this: *pip install -e .*
+To install toolkit module into your environment, type this: *pip install git+https://github.com/apricot073/calc_proj073.git*
 
 # usage
 
