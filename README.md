@@ -1,11 +1,21 @@
 # toolkit
 
-CLI toolkit: an expression calculator and a unit converter.
+This is a CLI toolkit that includes an expression calculator and a unit converter.
 
 # installing
 
-pip install -e .
+To install toolkit module into your environment, type this: *pip install -e .*
 
 # usage
 
-python -m toolkit --help
+To evaluate an expression: *python -m toolkit calc "EXPRESSION"*
+
+To convert from one unit to another: *python -m toolkit convert VALUE --from UNIT --to UNIT*
+
+For details: *python -m toolkit --help*
+
+# extra
+
+The calculator works with any number of unary signs.
+
+For example, you can test the following: 5----5 = 10

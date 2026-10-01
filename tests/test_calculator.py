@@ -46,6 +46,14 @@ def test_modulo_negative():
     assert calc("-8%3") == 1
 
 
+def test_exponentiation():
+    assert calc("2**10") == 1024
+
+
+def test_negative_power():
+    assert calc("2**-2") == 0.25
+
+
 def test_float_numbers():
     assert calc("2.5+1.5") == 4.0
 

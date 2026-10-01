@@ -19,14 +19,11 @@ class Calc:
         This function splits the expression into a list of tokens.
         :param input1: the expression passed through parser in __main__
         """
-        if not input1 or set(input1) == {' '}:
+        if not input1 or not input1.strip():
             raise CalcError('Empty sequence.')
         self.orig_expression = input1
         symbols = [x for x in input1 if x != ' ']
-        digits = ['0123456789.', 'number']
-        operators1 = ['+-', 'operator1']
-        operators2 = ['*/%', 'operator2']
-        possible_symbols = [digits, operators1, operators2]
+        possible_symbols = [['0123456789.', 'number'], ['+-', 'operator1'], ['*/%', 'operator2']]
         tokens = []
         mode = ''
         for n, sym in enumerate(symbols):
@@ -34,7 +31,8 @@ class Calc:
             for sublist in possible_symbols:
                 if sym in sublist[0]:
                     found = True
-                    if 0 < n < len(symbols)-1 and sym in '+-' and symbols[n-1] not in '0123456789.' and symbols[n+1] in '0123456789.':
+                    s = '0123456789.'
+                    if 0 < n < len(symbols)-1 and sym in '+-' and symbols[n-1] not in s and symbols[n+1] in s:
                         mode = 'number'
                         tokens.append(sym)
                     else:
@@ -64,8 +62,9 @@ class Calc:
         if any(x for x in '+-*/.' if x in tokens0) and not any(x for x in '0123456789' if x in tokens0):
             raise CalcError('Invalid sequence.')
 
-        invalid_sequences = [''.join(x) for x in product('*/.', repeat=2)] + ['+*', '-*', '+/', '-/']
+        invalid_sequences = [''.join(x) for x in product('*/.', repeat=2)] + ['+*', '-*', '+/', '-/', '///', '***']
         invalid_sequences.remove('//')
+        invalid_sequences.remove('**')
 
         def token_validation(token, nxt=None):
             """
@@ -75,8 +74,8 @@ class Calc:
             """
             if token.count('.') > 1:
                 raise CalcError('Invalid float number format.')
-            if token == '/' and nxt not in '+-*/.' and float(nxt) == 0:
-                raise CalcError('Division by zero.')
+            if (token == '/' or token == "//" or token == "%") and nxt not in '+-*/.' and float(nxt) == 0:
+                raise CalcError('Division by zero / modulo zero.')
             if nxt and any(x for x in invalid_sequences if x in token+nxt):
                 raise CalcError('Invalid sequence.')
 
@@ -93,14 +92,12 @@ class Calc:
                     tokens.pop(0)
                 else:
                     tokens.pop(0)
-                    if int(tokens[0]) < 0:
+                    if float(tokens[0]) < 0:
                         tokens[0] = tokens[0][1:]
                     else:
                         tokens[0] = '-' + tokens[0]
-
             else:
                 tokens.pop(0)
-
         elif tokens[0] in '*/':
             raise CalcError('Invalid starting symbol.')
 
@@ -127,13 +124,8 @@ class Calc:
             else:
                 expr[n - 1] = expr[n + 1] = 'Z'
 
-                if set(operator) == {'+'}:
-                    operator = '+'
-                if set(operator) == {'-'} or len(set(operator)) > 1:
-                    if operator.count('-') % 2 == 0:
-                        operator = '+'
-                    else:
-                        operator = '-'
+                if set(operator) <= {'+', '-'}:
+                    operator = '-' if operator.count('-') % 2 else '+'
 
                 if operator == '+':
                     expr[n] = a + b
@@ -141,13 +133,15 @@ class Calc:
                     expr[n] = a - b
                 if operator == '*':
                     expr[n] = a * b
+                if operator == '**':
+                    expr[n] = a ** b
                 if operator == '/':
                     expr[n] = a / b
                 if operator == '//':
                     expr[n] = a // b
                 if operator == '%':
                     expr[n] = a % b
-                expr[n] = round(expr[n], 4)
+                expr[n] = round(expr[n], 10)
                 expr = [x for x in expr if x != 'Z']
                 n -= 2
                 return n, expr
@@ -157,7 +151,7 @@ class Calc:
             if k >= len(exp) - 1:
                 break
             elem = exp[k]
-            if elem in ['*', '/', '//', '%']:
+            if elem in ['*', '/', '//', '%', '**']:
                 k, exp = operation(exp, k, elem)
             k += 1
         k = 0

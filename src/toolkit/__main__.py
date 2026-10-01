@@ -18,7 +18,9 @@ def build_parser():
     calc_parser = subparsers.add_parser(
         "calc",
         help="Evaluate an arithmetic expression",
-        description="Supported operators: + - * / (unary +/- allowed)",
+        description="Supported operators:\nAddition: +\nSubtraction: -\nMultiplication: *\n"
+                    "Exponentiation: **\nDivision: /\nInteger division: //\nModulo: %",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     calc_parser.add_argument(
         "expression",
@@ -57,7 +59,7 @@ def main(argv: list[str]):
             my_calc.validation()
             print(my_calc.calculation())
         elif args.command == "convert":
-            print(convert(args.value,args.from_unit, args.to_unit))
+            print(convert(args.value, args.from_unit, args.to_unit))
     except (CalcError, ConvError) as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(2)
